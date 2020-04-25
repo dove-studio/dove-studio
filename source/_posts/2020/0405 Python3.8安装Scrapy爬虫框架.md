@@ -2,7 +2,6 @@
 title: Python3.8安装Scrapy爬虫框架
 categories:
   - Windows
-  - Python
 tags:
   - Python
   - Scrapy

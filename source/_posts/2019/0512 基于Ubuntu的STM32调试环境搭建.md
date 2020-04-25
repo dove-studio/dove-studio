@@ -1,7 +1,7 @@
 ---
 title: 基于Ubuntu的STM32调试环境搭建
 categories:
-  - STM32
+  - ARM
 tags:
   - STM32
   - STLINK

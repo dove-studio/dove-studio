@@ -1,7 +1,7 @@
 ---
 title: 'Hexo+Github,搭建属于自己的博客'
 categories:
-  - Blog
+  - Web
 tags:
   - Hexo
   - Github

@@ -91,6 +91,9 @@ symbols_count_time:
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type: git
+- type: git
   repo: git@github.com:dove-studio/dove-studio.github.io.git
+  branch: master
+- type: git
+  repo: git@gitee.com:dove-studio/dove-studio.git
   branch: master

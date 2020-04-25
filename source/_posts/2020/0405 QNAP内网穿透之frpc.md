@@ -1,7 +1,6 @@
 ---
 title: QNAP内网穿透之frpc
 categories:
-  - Web
   - NAS
 tags:
   - QNAP

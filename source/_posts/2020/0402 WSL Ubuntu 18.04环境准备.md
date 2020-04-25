@@ -2,7 +2,6 @@
 title: WSL Ubuntu 18.04环境准备
 categories:
   - Windows
-  - Linux
 tags:
   - Ubuntu
   - WSL

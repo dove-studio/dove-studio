@@ -4,7 +4,6 @@ categories:
   - Linux
 tags:
   - Ubuntu
-  - home
 mp3:
   - 'http://link.hhtjim.com/163/425570952.mp3'
   - 'http://link.hhtjim.com/163/425570952.mp3'

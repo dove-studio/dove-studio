@@ -2,7 +2,6 @@
 title: Win7下pip默认镜像源的配置
 categories:
   - Windows
-  - Python
 tags:
   - Python
   - PIP

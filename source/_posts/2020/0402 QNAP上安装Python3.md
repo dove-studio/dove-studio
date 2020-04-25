@@ -2,7 +2,6 @@
 title: QNAP上安装Python3
 categories:
   - NAS
-  - Python
 tags:
   - QNAP
   - Python

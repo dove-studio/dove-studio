@@ -3,9 +3,7 @@ title: Ubuntu关机时间过长
 categories:
   - Linux
 tags:
-  - 关机太慢
   - Ubuntu
-  - Watchdog
   - MYSQL
 mp3:
   - 'http://link.hhtjim.com/163/425570952.mp3'
