@@ -13,6 +13,18 @@
             "type": "shell",
             "command": "git commit -m 'update'",
             "dependsOn":["git-add"]
+        },
+        {
+            "label": "push-gitee",
+            "type": "shell",
+            "command": "git push gitee master",
+            "dependsOn":["git-commit"]
+        },
+        {
+            "label": "push-github",
+            "type": "shell",
+            "command": "git push github master",
+            "dependsOn":["push-gitee"]
         }
     ]
 }
