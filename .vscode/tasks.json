@@ -4,6 +4,29 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "hexo-clean",
+            "type": "shell",
+            "command": "hexo clean"
+        },
+        {
+            "label": "hexo-g",
+            "type": "shell",
+            "command": "hexo g",
+            "dependsOn":["hexo-clean"]
+        },
+        {
+            "label": "hexo-s",
+            "type": "shell",
+            "command": "hexo s",
+            "dependsOn":["hexo-g"]
+        },
+        {
+            "label": "hexo-d",
+            "type": "shell",
+            "command": "hexo d",
+            "dependsOn":["hexo-g"]
+        },
+        {
             "label": "git-add",
             "type": "shell",
             "command": "git add ."
