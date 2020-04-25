@@ -1,0 +1,77 @@
+---
+title: WSL Ubuntu 18.04环境准备
+categories:
+  - Windows
+  - Linux
+tags:
+  - Ubuntu
+  - WSL
+mp3:
+  - 'http://link.hhtjim.com/163/425570952.mp3'
+  - 'http://link.hhtjim.com/163/425570952.mp3'
+cover: /img/cover.jpg
+abbrlink: a9f80523
+date: 2020-04-02 19:20:00
+---
+## 更换国内源
+
+系统默认的apt源是国外的，下载软件速度慢，python的pip源也很慢，我们都换成阿里云的源。
+
+### 更换apt源：
+
+    cd /etc/apt/sudo
+    cp sources.list sources.list.bak && sudo vim sources.list
+
+删除其中所有内容(dG)，替换成：
+
+    deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
+    deb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
+    deb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
+    deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+    deb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+
+然后更新
+
+    sudo apt update
+    sudo apt upgrade
+
+### 更换pip源
+
+安装pip并设置成默认
+
+    sudo apt install python3-pip
+    sudo ln -s /usr/bin/python3 /usr/bin/python
+    sudo ln -s /usr/bin/pip3 /usr/bin/pip
+
+修改pip源：
+
+    mkdir ~/.pip && vi ~/.pip/pip.conf
+
+在打开的vim中输入下文并保存：
+
+    [global]
+    index-url = http://mirrors.aliyun.com/pypi/simple/
+    [install]
+    trusted-host = mirrors.aliyun.com
+
+### 准备Hexo环境
+
+安装nodejs及npm
+
+    sudo apt update
+    sudo apt install nodejs
+    sudo apt install npm
+
+配置npm
+
+    npm config set registry https://registry.npm.taobao.org
+    npm config get registry // 配置后可通过该命令来验证是否成功
+
+安装hexo
+
+    npm install hexo-cli -g

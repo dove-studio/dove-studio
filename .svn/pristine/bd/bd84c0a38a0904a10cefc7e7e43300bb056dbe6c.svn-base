@@ -1,0 +1,204 @@
+---
+title: STM32CubeMX+VSCode开发STM32
+categories:
+  - ARM
+tags:
+  - STM32
+  - VSCode
+mp3:
+  - 'http://link.hhtjim.com/163/425570952.mp3'
+  - 'http://link.hhtjim.com/163/425570952.mp3'
+cover: /img/cover.jpg
+abbrlink: 301421f9
+date: 2020-04-05 21:40:00
+---
+整体流程为：STM32CubeMX生成工程模板，VSCode编辑和调试程序，Make启动编译，ARM GCC编译程序，OpenOCD连接调试器。
+
+### 下载安装Java运行环境
+[适用于 Windows 的 32 位 Java][1]
+[适用于 Windows 的 64 位 Java][2]
+
+### 下载安装[STM32CubeMX][3]
+
+### 下载 [OpenOCD for Windows][4]
+下载后的文件不是安装包，把程序文件夹放入自己的软件安装目录下，将软件的bin文件夹路径加入用户环境变量PATH中。 如：
+
+    C:\ARM\OpenOCD\bin
+    # 运行以下命令验证
+    openocd -v
+
+### 下载安装 [arm-none-eabi-gcc][5]
+正常安装，安装后需要将软件的安装目录下的bin文件夹设置进入环境变量PATH中。 如：
+
+    C:\ARM\gcc-arm-none-eabi\9 2019-q4-major\bin
+    # 运行以下命令验证
+    arm-none-eabi-gcc -v
+
+### 下载 [make][6]
+下载文件选择Complete package, except sources。将bin文件夹设置进入环境变量PATH中。 如：
+
+    C:\ARM\GnuWin32\bin
+    # 运行以下命令验证
+    make -v
+
+### VSCode安装C/C++、ARM、Cortex-Debug、Cortex-Debug: Device Support Pack - STM32F1插件
+另外，还可以用Git Bash替代cmd，点击 文件 -> 首选项 -> 设置，来打开 VS Code 的配置文件（ VS Code 采用 json 格式的文件进行配置，没有图形界面），在文件中加入如下配置，尤其注意最后两项执行程序的路径要设到自己的路径下：
+```
+{
+    "editor.detectIndentation": false,
+    "git.ignoreMissingGitWarning": true,
+    "files.autoGuessEncoding": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnType": true,
+    "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
+    "terminal.external.windowsExec": "C:\\Program Files\\Git\\bin\\bash.exe",
+}
+```
+然后我们我们重启程序加载配置，而后点击 查看 -> 终端 可以看到 VS Code 的内部终端已经改变为 MINGW64 的终端。
+
+### 第一个工程
+使用STM32CubeMX生成一个Makefile工程，用VSCode添加工程文件夹到工作区，写个Led闪烁的程序。打开终端，终端输入make -j4（-j4指定4线程编译，提高速度）
+
+然后创建.vscode文件夹，增加以下3个配置文件
+#### c_cpp_properties.json
+用于设定工程的 Include 路径，宏定义及搜索浏览路径，其中需要设定三个参数：
+
+1 includePath 提供.h的搜索目录
+2 defines 编译时在指令中加入的宏定义
+3 path 使用右键或ctrl追踪函数实现时搜索的目录
+
+实际上我们只需要配置launch.json文件就可以实现全部的调试功能，但是由于vscode不会自动识别makefile中的配置参数，所以如果想要使其代码索引，智能感知运行正确的话，就需要我们单独设置其中的c_cpp_properties.json文件。
+```
+{
+    "configurations": [    
+        {    
+            "name": "Win32",    
+            "includePath": [    
+                "${workspaceFolder}/**",    
+                "C:/ARM/gcc-arm-none-eabi/9 2019-q4-major/arm-none-eabi/include",    
+                "C:/ARM/gcc-arm-none-eabi/9 2019-q4-major/arm-none-eabi/include/c++/9.2.1",    
+                "C:/ARM/gcc-arm-none-eabi/9 2019-q4-major/arm-none-eabi/include/c++/9.2.1/backward",    
+                "C:/ARM/gcc-arm-none-eabi/9 2019-q4-major/lib/gcc/arm-none-eabi/9.2.1/include",    
+                "C:/ARM/gcc-arm-none-eabi/9 2019-q4-major/lib/gcc/arm-none-eabi/9.2.1/include-fixed",    
+                "Drivers/CMSIS/Include",    
+                "Drivers/CMSIS/Device/ST/STM32F1xx/Include",    
+                "Drivers/STM32F1xx_HAL_Driver/Inc",    
+                "Drivers/STM32F1xx_HAL_Driver/Inc/Legacy",    
+                "Drivers/STM32F1xx_HAL_Driver/Src",    
+                "Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc",    
+                "Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src",    
+                "Middlewares/ST/STM32_USB_Device_Library/Core/Inc",    
+                "Middlewares/ST/STM32_USB_Device_Library/Core/Src",   
+                "Inc",    
+                "Src"    
+            ], 
+            "defines": [    
+                "_DEBUG",    
+                "UNICODE",    
+                "_UNICODE",    
+                "STM32F103xB"    
+            ],    
+            "intelliSenseMode": "msvc-x64"    
+        }    
+    ],    
+    "version": 4    
+}
+```
+
+#### tasks.json
+配置build命令，build命令用来生成可执行文件（.elf、.hex）
+配置clean命令，clean命令用来清除build过程的中间文件以及build目录
+```
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "make clean",
+        },
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "make -j4"
+        }
+    ]
+}
+```
+点击终端运行任务，建立task.json之后会看到两个task，build和clean
+
+#### launch.json
+cwd ： current working directory for finding dependencies and other files
+request： the request type of this launch configuration.
+executable：被调试文件的路径
+svdFile：根据芯片的型号在插件目录下进行选择
+servertype：调试类型
+configFiles：openocd的interface和target目录下进行选择
+preLaunchTask：运行调试之后先运行task命令生成elf文件
+```
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cortex Debug",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceFolder}/build/${workspaceRootFolderName}.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "svdFile": "C:/Users/will/.vscode/extensions/marus25.cortex-debug-dp-stm32f1-1.0.0/data/STM32F103xx.svd",
+            "servertype": "openocd",
+            "configFiles": [
+                "interface/stlink-v2.cfg",
+                "target/stm32f1x_stlink.cfg"
+            ],
+            "preLaunchTask": "build"
+        }
+    ]
+}
+```
+注意我用的调试器为stlink-v2，器件为stm32f1x，需要根据调试器和器件做适当的修改
+
+### 启动调试
+直接F5启动调试即可，启动调试时会自动编译并打开OpenOCD服务。设置断点，继续F5调试。
+
+先停止程序再退出调试，否则会影响第二次调试。
+
+添加需编译的文件：在Makefile文件里，c文件在C_SOURCES下照着其它文件的路径格式写，h文件在C_INCLUDES下照着其它文件的路径格式写。
+
+去除需编译的文件：把Makefile文件里的头文件和源文件路径删掉，再把生成的build文件夹删掉，再重新编译。
+
+### 使Makefile支持C++（**未验证**）：
+
+Makefile文件更改如下：
+
+增加：
+CXX_SOURCES =  \
+Src/File.cpp #所有的cpp文件都写在这
+CXX = $(GCC_PATH)/$(PREFIX)g++和CXX = $(PREFIX)g++
+CXXFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+CXXFLAGS += -g -gdwarf-2
+CXXFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
+
+修改：LDFLAGS = $(MCU) -specs=nano.specs -specs=nosys.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections #在-specs=nano.specs后面加-specs=nosys.specs。删除-specs=nano.specs可使用异常捕获等语法，但会使RAM增加约2KB，ROM增加约54KB
+
+增加：
+OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(CXX_SOURCES:.cpp=.o)))
+vpath %.cpp $(sort $(dir $(CXX_SOURCES)))
+$(BUILD_DIR)/%.o: %.cpp Makefile | $(BUILD_DIR)
+$(CXX) -c $(CXXFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.cpp=.lst)) $< -o $@
+
+修改：
+$(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
+$(CXX) $(OBJECTS) $(LDFLAGS) -o $@ #用CXX替换原来的CC
+$(SZ) $@
+
+main.c不用改成main.cpp，只需把main.c要用的cpp文件里的函数改成C接口，在main.c里用extern void F(void);声明函数后即可使用。这些在cpp文件里被设为C接口的函数不能在cpp文件的h文件里直接声明。
+
+
+  [1]: https://www.java.com/zh_CN/download/
+  [2]: https://www.java.com/zh_CN/download/windows-64bit.jsp
+  [3]: http://www.st.com/content/st_com/zh/products/development-tools/software-development-tools/stm32-software-development-tools/stm32-configurators-and-code-generators/stm32cubemx.html
+  [4]: https://gnutoolchains.com/arm-eabi/openocd/
+  [5]: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
+  [6]: http://gnuwin32.sourceforge.net/packages/make.htm
