@@ -1,0 +1,29 @@
+---
+title: WSL 挂载移动硬盘U盘
+categories:
+  - Windows
+tags:
+  - Ubuntu
+  - WSL
+mp3:
+  - 'http://link.hhtjim.com/163/425570952.mp3'
+  - 'http://link.hhtjim.com/163/425570952.mp3'
+cover: /img/cover.jpg
+abbrlink: ab7eb2fe
+date: 2020-04-04 11:58:00
+---
+假设你的移动硬盘在windows下显示为 F:\
+
+1.新建文件夹f
+
+    sudo mkdir /mnt/f
+
+2.挂载盘符f
+
+    sudo mount -t drvfs F: /mnt/f
+
+3.大功告成。进入/mnt/f即可与windows下一摸一样。
+
+4.弹出移动硬盘，这样才能在windows下正常弹出，否则是会一直占用的。
+
+    sudo umount /mnt/f
